@@ -1,0 +1,11 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "WebGoatCore/bin/Release/net7.0/publish",
+    "appService.defaultWebAppToDeploy": "None",
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\Users\\jbarbosa\\.azurelogicapps\\dependencies\\DotNetSDK;${env:PATH}"
+    },
+    "omnisharp.dotNetCliPaths": [
+        "C:\\Users\\jbarbosa\\.azurelogicapps\\dependencies\\DotNetSDK"
+    ]
+}

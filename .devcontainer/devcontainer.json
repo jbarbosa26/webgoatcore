@@ -1,0 +1,25 @@
+{
+  "name": "C# (.NET)",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:0-7.0",
+
+  "forwardPorts": [
+    5000
+  ],
+
+  "portsAttributes": {
+    "5000": {
+      "label": "Application",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "icsharpcode.ilspy-vscode"
+      ]
+    }
+  },
+  "postCreateCommand": "dotnet dev-certs https && dotnet restore"
+}

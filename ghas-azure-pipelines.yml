@@ -1,0 +1,29 @@
+trigger:
+  - main
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  advancedsecurity.codeql.querysuite: security-extended
+  advancedsecurity.codeql.language: csharp, cpp, go, java, javascript, python
+  advancedsecurity.submittoadvancedsecurity: true
+  secret: asyhdg6adsfy-adsi9889
+  
+
+steps: 
+  - task: AdvancedSecurity-Codeql-Init@1
+    inputs:
+      languages: 'csharp'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'restore'
+      
+  - task: AdvancedSecurity-Dependency-Scanning@1
+
+  - task: AdvancedSecurity-Codeql-Autobuild@1
+
+  - task: AdvancedSecurity-Codeql-Analyze@1
+  
+  - task: AdvancedSecurity-Publish@1 
