@@ -7,6 +7,10 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+      - staging
   workflow_dispatch:
 
 jobs:
@@ -35,11 +39,11 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
-  deploy:
+  deploy-dev:
     runs-on: windows-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'dev'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -63,6 +67,66 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'webgoatex'
+          slot-name: 'dev'
+          package: .
+
+  deploy-staging:
+      runs-on: windows-latest
+      needs: deploy-dev
+      environment:
+        name: 'staging'
+      permissions:
+        id-token: write # This is required for requesting the JWT
+        contents: read # This is required for actions/checkout
+  
+      steps:
+        - name: Download artifact from build job
+          uses: actions/download-artifact@v4
+          with:
+            name: .net-app
+  
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B6C1F06242774A24B9C1DA60A958A0DE }}
+            tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DBCE7CFBE7884D40BF3A2AAC19A0DD75 }}
+            subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8047C10A9C934E20BF3DC708E31AC5DE }}
+  
+        - name: Deploy to Azure Web App
+          id: deploy-to-webapp
+          uses: azure/webapps-deploy@v3
+          with:
+            app-name: 'webgoatex-staging'
+            slot-name: 'staging'
+            package: .
+  
+  deploy-prod:
+    runs-on: windows-latest
+    needs: deploy-staging
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_PROD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'webgoatex'
           slot-name: 'Production'
           package: .
-          
