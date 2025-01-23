@@ -71,35 +71,35 @@ jobs:
           package: .
 
   deploy-staging:
-      runs-on: windows-latest
-      needs: deploy-dev
-      environment:
-        name: 'staging'
-        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-      permissions:
-        id-token: write #This is required for requesting the JWT
-        contents: read #This is required for actions/checkout
-  
-      steps:
-        - name: Download artifact from build job
-          uses: actions/download-artifact@v4
-          with:
-            name: .net-app
-        
-        - name: Login to Azure
-          uses: azure/login@v2
-          with:
-            client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EC7DA0B7969140A599BAF46C59BB4272 }}
-            tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_519FC0D3EEF24EA7AC3681F44791F2CA }}
-            subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A119FB813188468F961031A1A0787F37 }}
-  
-        - name: Deploy to Azure Web App
-          id: deploy-to-webapp
-          uses: azure/webapps-deploy@v3
-          with:
-            app-name: 'webgoatex-staging'
-            slot-name: 'staging'
-            package: .
+    runs-on: windows-latest
+    needs: deploy-dev
+    environment:
+      name: 'staging'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EC7DA0B7969140A599BAF46C59BB4272 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_519FC0D3EEF24EA7AC3681F44791F2CA }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A119FB813188468F961031A1A0787F37 }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'webgoatex'
+          slot-name: 'staging'
+          package: .
   
   deploy-prod:
     runs-on: windows-latest
